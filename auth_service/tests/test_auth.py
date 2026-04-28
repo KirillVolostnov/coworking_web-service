@@ -14,25 +14,30 @@ def test_login_and_validate():
 
 
 def test_admin_can_create_user_and_new_user_can_login():
+    from uuid import uuid4
+
     from fastapi.testclient import TestClient
 
     from app.main import app
 
     with TestClient(app) as client:
+        username = f"new_user_{uuid4().hex[:8]}"
+        password = "new_password"
+
         admin_login = client.post("/login", json={"username": "admin", "password": "admin123"})
         assert admin_login.status_code == 200
         admin_token = admin_login.json()["access_token"]
 
         create_user = client.post(
             "/users",
-            json={"username": "new_user", "password": "new_password"},
+            json={"username": username, "password": password},
             headers={"Authorization": f"Bearer {admin_token}"},
         )
         assert create_user.status_code == 201
-        assert create_user.json()["username"] == "new_user"
+        assert create_user.json()["username"] == username
         assert create_user.json()["role"] == "user"
 
-        user_login = client.post("/login", json={"username": "new_user", "password": "new_password"})
+        user_login = client.post("/login", json={"username": username, "password": password})
         assert user_login.status_code == 200
 
 

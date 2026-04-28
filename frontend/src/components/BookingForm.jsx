@@ -1,6 +1,26 @@
 import { useState } from "react";
 import { checkAvailability, createBooking } from "../api/client";
 
+function translateBookingMessage(message) {
+  if (!message) {
+    return "Слот недоступен";
+  }
+
+  if (message.includes("Booking cannot exceed 6 hours")) {
+    return "Бронирование не может длиться больше 6 часов";
+  }
+
+  if (message.includes("Selected time slot is already occupied")) {
+    return "Выбранный временной слот уже занят";
+  }
+
+  if (message.includes("end_time must be greater than start_time")) {
+    return "Время окончания должно быть позже времени начала";
+  }
+
+  return message;
+}
+
 export default function BookingForm({ roomId, token }) {
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
@@ -15,10 +35,10 @@ export default function BookingForm({ roomId, token }) {
         end_time: end
       });
       setIsError(!response.available);
-      setMessage(response.available ? "Слот свободен" : response.reason || "Слот недоступен");
+      setMessage(response.available ? "Слот свободен" : translateBookingMessage(response.reason));
     } catch (error) {
       setIsError(true);
-      setMessage(error.message);
+      setMessage(translateBookingMessage(error.message));
     }
   }
 
@@ -36,7 +56,7 @@ export default function BookingForm({ roomId, token }) {
       setMessage("Бронирование создано");
     } catch (error) {
       setIsError(true);
-      setMessage(error.message);
+      setMessage(translateBookingMessage(error.message));
     }
   }
 

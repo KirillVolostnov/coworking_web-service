@@ -11,7 +11,7 @@ MAX_BOOKING_HOURS = 6
 def validate_booking_constraints(db: Session, request: BookingRequest) -> tuple[bool, str | None]:
     duration = request.end_time - request.start_time
     if duration > timedelta(hours=MAX_BOOKING_HOURS):
-        return False, "Бронирование не может длиться больше 6 часов"
+        return False, "Booking cannot exceed 6 hours"
 
     conflict = (
         db.query(Booking)
@@ -23,5 +23,5 @@ def validate_booking_constraints(db: Session, request: BookingRequest) -> tuple[
         .first()
     )
     if conflict:
-        return False, "Выбранный временной слот уже занят"
+        return False, "Selected time slot is already occupied"
     return True, None

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from app.logic import validate_booking_constraints
 from app.models import Booking
@@ -25,7 +25,7 @@ class DummyDb:
 
 
 def test_rejects_duration_over_6_hours():
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     req = BookingRequest(
         room_id=1,
         start_time=now,
@@ -37,7 +37,7 @@ def test_rejects_duration_over_6_hours():
 
 
 def test_detects_collision():
-    now = datetime.utcnow()
+    now = datetime.now(UTC)
     req = BookingRequest(
         room_id=1,
         start_time=now,
