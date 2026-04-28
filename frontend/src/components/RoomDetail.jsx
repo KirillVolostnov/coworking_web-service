@@ -1,6 +1,6 @@
 import BookingForm from "./BookingForm";
 
-export default function RoomDetail({ room, token }) {
+export default function RoomDetail({ room, token, onBooked }) {
   if (!room) {
     return null;
   }
@@ -12,7 +12,7 @@ export default function RoomDetail({ room, token }) {
       <p>
         <strong>Оборудование:</strong> {room.equipment.join(", ")}
       </p>
-      <BookingForm roomId={room.id} token={token} />
+      <BookingForm roomId={room.id} token={token} onBooked={onBooked} />
     </div>
   );
 }

@@ -88,6 +88,10 @@ label {
   margin-top: 12px;
 }
 
+.date-picker-input {
+  width: 100%;
+}
+
 .error {
   color: #dc2626;
 }

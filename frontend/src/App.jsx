@@ -3,7 +3,7 @@ import AddUserPanel from "./components/AddUserPanel";
 import AdminPanel from "./components/AdminPanel";
 import RoomCard from "./components/RoomCard";
 import RoomDetail from "./components/RoomDetail";
-import { fetchRooms, login } from "./api/client";
+import { fetchMyBookings, fetchRooms, login } from "./api/client";
 
 function parseJwt(token) {
   if (!token) {
@@ -20,6 +20,7 @@ function parseJwt(token) {
 
 export default function App() {
   const [rooms, setRooms] = useState([]);
+  const [myBookings, setMyBookings] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [username, setUsername] = useState("user");
   const [password, setPassword] = useState("user123");
@@ -45,9 +46,19 @@ export default function App() {
     }
   }
 
+  async function loadMyBookings() {
+    try {
+      const bookings = await fetchMyBookings(token);
+      setMyBookings(bookings);
+    } catch {
+      setMyBookings([]);
+    }
+  }
+
   useEffect(() => {
     if (token) {
       loadRooms().catch(() => {});
+      loadMyBookings().catch(() => {});
     }
   }, [token]);
 
@@ -67,7 +78,26 @@ export default function App() {
     setToken("");
     setSelectedRoom(null);
     setIsAddUserOpen(false);
+    setMyBookings([]);
   }
+
+  const roomNamesById = useMemo(
+    () => rooms.reduce((map, room) => ({ ...map, [room.id]: room.name }), {}),
+    [rooms]
+  );
+
+  const dateTimeFormatter = useMemo(
+    () =>
+      new Intl.DateTimeFormat("ru-RU", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+      }),
+    []
+  );
 
   if (!token) {
     return (
@@ -120,6 +150,27 @@ export default function App() {
       {isAdmin && isAddUserOpen ? <AddUserPanel token={token} onClose={() => setIsAddUserOpen(false)} /> : null}
       {isAdmin ? <AdminPanel token={token} onCreated={loadRooms} /> : null}
 
+      <h2 style={{ marginTop: 20 }}>Мои бронирования</h2>
+      <div className="grid">
+        {myBookings.length === 0 ? (
+          <div className="card">
+            <p style={{ margin: 0 }}>У вас пока нет активных бронирований.</p>
+          </div>
+        ) : (
+          myBookings.map((booking) => (
+            <div className="card" key={booking.id}>
+              <h3 style={{ marginTop: 0, marginBottom: 8 }}>
+                {roomNamesById[booking.room_id] || `Помещение #${booking.room_id}`}
+              </h3>
+              <p style={{ margin: 0 }}>
+                {dateTimeFormatter.format(new Date(booking.start_time))} -{" "}
+                {dateTimeFormatter.format(new Date(booking.end_time))}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+
       <h2 style={{ marginTop: 20 }}>Помещения</h2>
       {roomsError ? <p className="error">{roomsError}</p> : null}
       <div className="grid">
@@ -127,7 +178,7 @@ export default function App() {
           <RoomCard key={room.id} room={room} onSelect={setSelectedRoom} />
         ))}
       </div>
-      <RoomDetail room={selectedRoom} token={token} />
+      <RoomDetail room={selectedRoom} token={token} onBooked={loadMyBookings} />
     </div>
   );
 }

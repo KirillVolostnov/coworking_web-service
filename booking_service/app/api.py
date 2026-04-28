@@ -35,3 +35,18 @@ def create_booking(
     db.commit()
     db.refresh(booking)
     return booking
+
+
+@router.get("/bookings/me", response_model=list[BookingResponse])
+def list_my_bookings(
+    claims: dict = Depends(get_claims),
+    db: Session = Depends(get_db),
+):
+    username = claims.get("sub", "")
+    bookings = (
+        db.query(Booking)
+        .filter(Booking.username == username)
+        .order_by(Booking.start_time.asc())
+        .all()
+    )
+    return bookings
