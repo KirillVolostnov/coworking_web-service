@@ -9,3 +9,5 @@ coverage/
 *.db
 *.sqlite3
 .env
+.env.example
+.cursor/
