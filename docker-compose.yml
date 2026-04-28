@@ -1,0 +1,53 @@
+services:
+  auth_service:
+    build: ./auth_service
+    environment:
+      AUTH_DATABASE_URL: sqlite:////data/auth.db
+      JWT_SECRET: super-secret-key
+      JWT_ALGORITHM: HS256
+      ADMIN_USERNAME: admin
+      ADMIN_PASSWORD: admin123
+      DEFAULT_USERNAME: user
+      DEFAULT_PASSWORD: user123
+    volumes:
+      - auth_data:/data
+
+  room_service:
+    build: ./room_service
+    environment:
+      ROOM_DATABASE_URL: sqlite:////data/room.db
+      JWT_SECRET: super-secret-key
+      JWT_ALGORITHM: HS256
+    volumes:
+      - room_data:/data
+
+  booking_service:
+    build: ./booking_service
+    environment:
+      BOOKING_DATABASE_URL: sqlite:////data/booking.db
+      JWT_SECRET: super-secret-key
+      JWT_ALGORITHM: HS256
+    volumes:
+      - booking_data:/data
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - auth_service
+      - room_service
+      - booking_service
+
+  gateway:
+    build: ./gateway
+    depends_on:
+      - frontend
+      - auth_service
+      - room_service
+      - booking_service
+    ports:
+      - "80:80"
+
+volumes:
+  auth_data:
+  room_data:
+  booking_data:

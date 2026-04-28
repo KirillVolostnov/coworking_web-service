@@ -1,0 +1,60 @@
+---
+alwaysApply: true
+---
+
+---
+description: Comprehensive rules and architecture for the Microservice Booking System
+globs: **/*.{py,js,jsx,dockerfile,yml,yaml}
+---
+
+# Booking System Specification & Development Rules
+
+## 1. System Overview
+The system provides a microservice-based solution for booking coworking spaces. It features a minimalist React frontend and a FastAPI backend, utilizing SQLite for data persistence and Docker for orchestration.
+
+## 2. Technical Stack
+- **Language:** Python 3.10+ (Backend), JavaScript/React (Frontend)
+- **Frameworks:** FastAPI, SQLAlchemy, Vite, Tailwind CSS
+- **Database:** SQLite (isolated per service)
+- **Proxy:** Nginx (API Gateway)
+- **CI/CD:** GitHub Actions (Linting, Testing, Docker Build)
+
+## 3. Core Functionality & User Flow
+
+### 3.1 User Experience
+- **Authentication:** Users log in to access the dashboard. Roles: `admin`, `user`.
+- **Main Gallery:** Home page displays rooms as **cards** containing:
+  - Room Name
+  - Capacity
+  - Thumbnail Photo
+- **Detail View:** Clicking a card expands it to reveal:
+  - Comprehensive description.
+  - Equipment List: (e.g., Air conditioning, Projector, Whiteboard).
+  - Booking Form: Integrated date and time selectors.
+- **Availability Check:** The system performs real-time validation. If a selected slot is occupied or exceeds 6 hours, an immediate warning is displayed.
+
+### 3.2 Administrator Capabilities
+- **Room Management:** A dedicated tab provides a form to add new rooms.
+- **Data Entry:** Admins populate all user-facing fields: name, capacity, description, equipment list, and photo URLs.
+
+## 4. Project Structure
+
+```text
+/
+├── auth_service/           # Identity & Access Management
+│   ├── app/
+│   │   ├── models.py       # User (id, username, password_hash, role)
+│   │   └── auth.py         # JWT logic & Role-Based Access Control (RBAC)
+├── room_service/           # Catalog Management
+│   ├── app/
+│   │   ├── models.py       # Room (id, name, capacity, description, equipment, photo_url)
+│   │   └── schemas.py      # Validation for complex equipment lists
+├── booking_service/        # Business Logic & Validation
+│   ├── app/
+│   │   ├── logic.py        # Collision detection & 6-hour limit enforcement
+│   │   └── api.py          # /check-availability endpoint for real-time UI feedback
+├── frontend/               # React SPA
+│   ├── src/components/     # RoomCard, RoomDetail, BookingForm, AdminPanel
+│   └── src/api/            # Gateway-aware API client
+├── gateway/                # Nginx Reverse Proxy
+└── docker-compose.yml      # Multi-container orchestration
