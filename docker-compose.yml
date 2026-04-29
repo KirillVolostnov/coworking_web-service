@@ -1,6 +1,7 @@
 services:
   auth_service:
     build: ./auth_service
+    image: kirillvolostnov/auth_service:latest
     environment:
       AUTH_DATABASE_URL: sqlite:////data/auth.db
       JWT_SECRET: super-secret-key
@@ -14,6 +15,7 @@ services:
 
   room_service:
     build: ./room_service
+    image: kirillvolostnov/room_service:latest
     environment:
       ROOM_DATABASE_URL: sqlite:////data/room.db
       JWT_SECRET: super-secret-key
@@ -23,6 +25,7 @@ services:
 
   booking_service:
     build: ./booking_service
+    image: kirillvolostnov/booking_service:latest
     environment:
       BOOKING_DATABASE_URL: sqlite:////data/booking.db
       JWT_SECRET: super-secret-key
@@ -32,6 +35,7 @@ services:
 
   frontend:
     build: ./frontend
+    image: kirillvolostnov/frontend:latest
     depends_on:
       - auth_service
       - room_service
@@ -39,6 +43,7 @@ services:
 
   gateway:
     build: ./gateway
+    image: kirillvolostnov/gateway:latest
     depends_on:
       - frontend
       - auth_service
