@@ -1,0 +1,33 @@
+services:
+  # Бэкенд: сервис авторизации
+  - type: web
+    name: auth-service
+    env: docker
+    dockerContext: ./auth_service
+    dockerfilePath: ./auth_service/Dockerfile
+    envVars:
+      - key: JWT_SECRET
+        fromSecret: JWT_SECRET
+      - key: ADMIN_PASSWORD
+        fromSecret: ADMIN_PASSWORD
+
+  # Бэкенд: сервис комнат
+  - type: web
+    name: room-service
+    env: docker
+    dockerContext: ./room_service
+    dockerfilePath: ./room_service/Dockerfile
+
+  # Гейтвей (Nginx) — точка входа
+  - type: web
+    name: gateway
+    env: docker
+    dockerContext: ./gateway
+    dockerfilePath: ./gateway/Dockerfile
+    plan: free 
+    envVars:
+      - key: AUTH_SERVICE_URL
+        value: http://auth-service:10000 
+    ports:
+      - port: 80
+        protocol: http
