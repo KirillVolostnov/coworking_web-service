@@ -28,6 +28,3 @@ services:
     envVars:
       - key: AUTH_SERVICE_URL
         value: http://auth-service:10000 
-    envVars:
-      - key: PORT
-        value: 80
