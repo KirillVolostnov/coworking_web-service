@@ -6,10 +6,7 @@ services:
     dockerContext: ./auth_service
     dockerfilePath: ./auth_service/Dockerfile
     envVars:
-      - key: JWT_SECRET
-        fromSecret: JWT_SECRET
-      - key: ADMIN_PASSWORD
-        fromSecret: ADMIN_PASSWORD
+      - fromGroup: coworking-secrets
 
   # Бэкенд: сервис комнат
   - type: web
