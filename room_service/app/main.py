@@ -27,7 +27,7 @@ def seed_default_rooms():
             "capacity": 4,
             "description": "Переговорная для небольших встреч и созвонов на 2-4 человека.",
             "equipment": "Маркерная доска|Экран",
-            "photo_url": "https://images.unsplash.com/photo-1497366216548-37526070297c",
+            "photo_url": "https://avatars.mds.yandex.net/i?id=24d4c0cfc9c09ddf6a0baa1623d2cc69_l-4825382-images-thumbs&n=13",
         },
         {
             "legacy_names": ["Beta room", "Переговорная Бета"],
@@ -35,7 +35,7 @@ def seed_default_rooms():
             "capacity": 6,
             "description": "Удобная переговорная для встреч команды и общения с клиентами до 6 человек.",
             "equipment": "Проектор|Маркерная доска|Конференц-телефон",
-            "photo_url": "https://images.unsplash.com/photo-1497366811353-6870744d04b2",
+            "photo_url": "https://mebel2biz.ru/tmp/45809d8ac049c82e517386bed47ff54af2983c11_optimizm.jpg",
         },
         {
             "legacy_names": ["Gamma room", "Переговорная Гамма"],
@@ -43,7 +43,7 @@ def seed_default_rooms():
             "capacity": 20,
             "description": "Большой зал для презентаций, стратегических сессий и общих обсуждений до 20 человек.",
             "equipment": "Проектор|Маркерная доска|Кондиционер|Видеоконференцсвязь",
-            "photo_url": "https://images.unsplash.com/photo-1524758631624-e2822e304c36",
+            "photo_url": "https://wtcmoscow.ru/upload/resize_cache/iblock/56c/600_600_1/Zal-S1.jpg",
         },
     ]
     try:

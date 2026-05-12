@@ -24,7 +24,7 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [username, setUsername] = useState("user");
   const [password, setPassword] = useState("user123");
-  const [token, setToken] = useState("");
+  const [token, setToken] = useState(() => localStorage.getItem("token") || "");
   const [authError, setAuthError] = useState("");
   const [roomsError, setRoomsError] = useState("");
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
@@ -57,8 +57,11 @@ export default function App() {
 
   useEffect(() => {
     if (token) {
+      localStorage.setItem("token", token);
       loadRooms().catch(() => {});
       loadMyBookings().catch(() => {});
+    } else {
+      localStorage.removeItem("token");
     }
   }, [token]);
 
@@ -102,7 +105,7 @@ export default function App() {
   if (!token) {
     return (
       <div className="container">
-        <h1>Бронирование коворкинга</h1>
+        <h1>Бронирование переговорных комнат</h1>
         <form className="card" onSubmit={onLogin} style={{ maxWidth: 420, margin: "40px auto" }}>
           <h3>Авторизация</h3>
           <label>
@@ -130,7 +133,7 @@ export default function App() {
     <div className="container">
       <div className="card header-card">
         <div>
-          <h1 style={{ margin: 0 }}>Бронирование коворкинга</h1>
+          <h1 style={{ margin: 0 }}>Бронирование переговорных комнат</h1>
           <p style={{ margin: "6px 0 0 0" }}>
             Вы вошли как {claims.sub} ({claims.role === "admin" ? "администратор" : "пользователь"})
           </p>

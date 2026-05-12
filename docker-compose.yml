@@ -1,40 +1,93 @@
 services:
-  auth_service:
-    build: ./auth_service
-    image: kirillvolostnov/auth_service:latest
+  auth_db:
+    image: postgres:16-alpine
     environment:
-      AUTH_DATABASE_URL: sqlite:////data/auth.db
-      JWT_SECRET: super-secret-key
-      JWT_ALGORITHM: HS256
-      ADMIN_USERNAME: admin
-      ADMIN_PASSWORD: admin123
-      DEFAULT_USERNAME: user
-      DEFAULT_PASSWORD: user123
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - auth_data:/data
+      - auth_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  room_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: room_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - room_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d room_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  booking_db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: booking_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - booking_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d booking_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  auth_service:
+    build:
+      context: .
+      target: auth-service
+    image: kirillvolostnov/auth_service:latest
+    depends_on:
+      auth_db:
+        condition: service_healthy
+    environment:
+      AUTH_DATABASE_URL: ${AUTH_DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      DEFAULT_USERNAME: ${DEFAULT_USERNAME}
+      DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}
 
   room_service:
-    build: ./room_service
+    build:
+      context: .
+      target: room-service
     image: kirillvolostnov/room_service:latest
+    depends_on:
+      room_db:
+        condition: service_healthy
     environment:
-      ROOM_DATABASE_URL: sqlite:////data/room.db
-      JWT_SECRET: super-secret-key
-      JWT_ALGORITHM: HS256
-    volumes:
-      - room_data:/data
+      ROOM_DATABASE_URL: ${ROOM_DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
 
   booking_service:
-    build: ./booking_service
+    build:
+      context: .
+      target: booking-service
     image: kirillvolostnov/booking_service:latest
+    depends_on:
+      booking_db:
+        condition: service_healthy
     environment:
-      BOOKING_DATABASE_URL: sqlite:////data/booking.db
-      JWT_SECRET: super-secret-key
-      JWT_ALGORITHM: HS256
-    volumes:
-      - booking_data:/data
+      BOOKING_DATABASE_URL: ${BOOKING_DATABASE_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
 
   frontend:
-    build: ./frontend
+    build:
+      context: .
+      target: frontend
     image: kirillvolostnov/frontend:latest
     depends_on:
       - auth_service
@@ -42,7 +95,9 @@ services:
       - booking_service
 
   gateway:
-    build: ./gateway
+    build:
+      context: .
+      target: gateway
     image: kirillvolostnov/gateway:latest
     depends_on:
       - frontend
@@ -53,6 +108,6 @@ services:
       - "80:80"
 
 volumes:
-  auth_data:
-  room_data:
-  booking_data:
+  auth_pg_data:
+  room_pg_data:
+  booking_pg_data:

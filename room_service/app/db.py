@@ -3,11 +3,8 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-DATABASE_URL = os.getenv("ROOM_DATABASE_URL", "sqlite:///./room.db")
-engine = create_engine(
-    DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
-)
+DATABASE_URL = os.getenv("ROOM_DATABASE_URL", "postgresql+psycopg2://postgres:postgres@localhost:5432/room_db")
+engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
