@@ -119,10 +119,6 @@ export default function App() {
           <button type="submit" style={{ marginTop: 10 }}>
             Войти
           </button>
-          <p style={{ marginTop: 12, fontSize: 13 }}>
-            Тестовый пользователь: <strong>user / user123</strong><br />
-            Тестовый администратор: <strong>admin / admin123</strong>
-          </p>
           {authError ? <p className="error">{authError}</p> : null}
         </form>
       </div>
