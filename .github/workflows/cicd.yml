@@ -87,7 +87,6 @@ jobs:
           script: |
             cd /opt/app || exit 1
             
-            # Авторизуемся в YCR на сервере
             echo '${{ secrets.YC_SA_JSON_CREDENTIALS }}' | docker login --username json_key --password-stdin cr.yandex
             
             # Обновляем переменные окружения
