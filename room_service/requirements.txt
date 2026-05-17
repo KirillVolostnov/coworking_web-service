@@ -1,8 +1,0 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-pydantic
-python-jose[cryptography]
-psycopg2-binary
-pytest
-httpx

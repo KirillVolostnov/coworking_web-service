@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from .auth import get_claims
-from .db import get_db
-from .logic import validate_booking_constraints
-from .models import Booking
-from .schemas import AvailabilityResponse, BookingRequest, BookingResponse
+from ..auth import get_current_claims
+from ..db import get_db
+from ..logic import validate_booking_constraints
+from ..models import Booking
+from ..schemas import AvailabilityResponse, BookingRequest, BookingResponse
 
 router = APIRouter()
 
@@ -19,7 +19,7 @@ def check_availability(payload: BookingRequest, db: Session = Depends(get_db)):
 @router.post("/bookings", response_model=BookingResponse)
 def create_booking(
     payload: BookingRequest,
-    claims: dict = Depends(get_claims),
+    claims: dict = Depends(get_current_claims),
     db: Session = Depends(get_db),
 ):
     available, reason = validate_booking_constraints(db, payload)
@@ -39,7 +39,7 @@ def create_booking(
 
 @router.get("/bookings/me", response_model=list[BookingResponse])
 def list_my_bookings(
-    claims: dict = Depends(get_claims),
+    claims: dict = Depends(get_current_claims),
     db: Session = Depends(get_db),
 ):
     username = claims.get("sub", "")

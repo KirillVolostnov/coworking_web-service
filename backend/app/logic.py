@@ -2,7 +2,7 @@ from datetime import timedelta
 
 from sqlalchemy.orm import Session
 
-from .models import Booking
+from .models import Booking, Room
 from .schemas import BookingRequest
 
 # Максимальная разрешенная длительность бронирования (в часах)
@@ -14,6 +14,11 @@ def validate_booking_constraints(db: Session, request: BookingRequest) -> tuple[
     Проверяет бизнес-правила перед созданием бронирования.
     Возвращает кортеж (успех, сообщение об ошибке).
     """
+    # 0. Проверка существования комнаты
+    room = db.query(Room).filter(Room.id == request.room_id).first()
+    if not room:
+        return False, "Room does not exist"
+
     # 1. Проверка максимальной длительности бронирования
     duration = request.end_time - request.start_time
     if duration > timedelta(hours=MAX_BOOKING_HOURS):

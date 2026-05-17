@@ -1,6 +1,7 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: always
     environment:
       POSTGRES_DB: app_db
       POSTGRES_USER: ${POSTGRES_USER}
@@ -8,16 +9,14 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d app_db"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d app_db"]
       interval: 5s
       timeout: 5s
       retries: 10
 
   backend:
-    build:
-      context: .
-      target: backend
-    image: kirillvolostnov/backend:latest
+    image: cr.yandex/${YCR_REGISTRY_ID}/backend:latest
+    restart: always
     depends_on:
       db:
         condition: service_healthy
@@ -31,18 +30,14 @@ services:
       DEFAULT_PASSWORD: ${DEFAULT_PASSWORD}
 
   frontend:
-    build:
-      context: .
-      target: frontend
-    image: kirillvolostnov/frontend:latest
+    image: cr.yandex/${YCR_REGISTRY_ID}/frontend:latest
+    restart: always
     depends_on:
       - backend
 
   gateway:
-    build:
-      context: .
-      target: gateway
-    image: kirillvolostnov/gateway:latest
+    image: cr.yandex/${YCR_REGISTRY_ID}/gateway:latest
+    restart: always
     depends_on:
       - frontend
       - backend

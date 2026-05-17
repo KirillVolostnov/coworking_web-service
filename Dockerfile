@@ -2,38 +2,30 @@
 FROM python:3.11-slim AS backend-base
 WORKDIR /app
 
-# --- Auth Service ---
-FROM backend-base AS auth-service
-COPY auth_service/requirements.txt .
+# --- Backend ---
+FROM backend-base AS backend
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY auth_service/app ./app
+COPY backend/app ./app
 EXPOSE 8000
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
-# --- Room Service ---
-FROM backend-base AS room-service
-COPY room_service/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY room_service/app ./app
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# --- Booking Service ---
-FROM backend-base AS booking-service
-COPY booking_service/requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-COPY booking_service/app ./app
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
-
-# --- Frontend ---
-FROM node:22-alpine AS frontend
+# --- Frontend Builder ---
+FROM node:22-alpine AS frontend-builder
 WORKDIR /app
 COPY frontend/package*.json ./
 RUN npm install
 COPY frontend/ .
-EXPOSE 5173
-CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "5173"]
+RUN npm run build
+
+# --- Frontend (Production) ---
+FROM nginx:1.27-alpine AS frontend
+# Копируем собранные статические файлы React
+COPY --from=frontend-builder /app/dist /usr/share/nginx/html
+# Настраиваем Nginx для корректной работы React Router (перенаправление на index.html)
+RUN echo 'server { listen 80; location / { root /usr/share/nginx/html; index index.html; try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
 
 # --- Gateway ---
 FROM nginx:1.27-alpine AS gateway

@@ -3,7 +3,7 @@ import AddUserPanel from "./components/AddUserPanel";
 import AdminPanel from "./components/AdminPanel";
 import RoomCard from "./components/RoomCard";
 import RoomDetail from "./components/RoomDetail";
-import { fetchMyBookings, fetchRooms, login } from "./api/client";
+import { fetchMyBookings, fetchRooms, login, deleteRoom } from "./api/client";
 
 function parseJwt(token) {
   if (!token) {
@@ -178,7 +178,22 @@ export default function App() {
       {roomsError ? <p className="error">{roomsError}</p> : null}
       <div className="grid">
         {rooms.map((room) => (
-          <RoomCard key={room.id} room={room} onSelect={setSelectedRoom} />
+          <RoomCard 
+            key={room.id} 
+            room={room} 
+            onSelect={setSelectedRoom} 
+            isAdmin={isAdmin}
+            onDelete={async () => {
+              if (window.confirm(`Вы уверены, что хотите удалить помещение "${room.name}"?`)) {
+                try {
+                  await deleteRoom(room.id, token);
+                  loadRooms();
+                } catch (error) {
+                  alert(error.message);
+                }
+              }
+            }}
+          />
         ))}
       </div>
       <RoomDetail room={selectedRoom} token={token} onBooked={loadMyBookings} />

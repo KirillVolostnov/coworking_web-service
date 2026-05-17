@@ -128,6 +128,20 @@ export async function createRoom(payload, token) {
   return res.json();
 }
 
+export async function deleteRoom(roomId, token) {
+  const res = await fetch(`${API_BASE}/rooms/rooms/${roomId}`, {
+    method: "DELETE",
+    headers: {
+      ...authHeaders(token)
+    }
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error(extractErrorMessage(body, "Не удалось удалить помещение"));
+  }
+  return res.json();
+}
+
 export async function checkAvailability(payload) {
   const res = await fetch(`${API_BASE}/bookings/check-availability`, {
     method: "POST",

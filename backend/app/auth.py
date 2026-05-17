@@ -64,3 +64,9 @@ def require_role(allowed_roles: list[str]):
         return claims
 
     return role_checker
+
+
+def require_admin(claims: dict = Depends(get_current_claims)) -> dict:
+    if claims.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin role required")
+    return claims
