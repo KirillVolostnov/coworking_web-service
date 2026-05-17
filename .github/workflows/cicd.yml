@@ -66,6 +66,18 @@ jobs:
     needs: build-and-push
     if: github.ref == 'refs/heads/main'
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4 # Скачиваем код репозитория, чтобы забрать docker-compose.prod.yml
+
+      - name: Copy docker-compose.prod.yml to Server
+        uses: appleboy/scp-action@v0.1.7 # Копируем файл конфигурации на сервер Яндекса
+        with:
+          host: ${{ secrets.VM_SSH_HOST }}
+          username: ${{ secrets.VM_SSH_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "docker-compose.prod.yml"
+          target: "/opt/app"
+
       - name: Deploy to Yandex Cloud VM
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -73,7 +85,6 @@ jobs:
           username: ${{ secrets.VM_SSH_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            # Переходим в папку с проектом (предполагается, что файлы уже там)
             cd /opt/app || exit 1
             
             # Авторизуемся в YCR на сервере
@@ -86,5 +97,5 @@ jobs:
             docker-compose -f docker-compose.prod.yml pull
             docker-compose -f docker-compose.prod.yml up -d --remove-orphans
             
-            # Очищаем старые неиспользуемые образы, чтобы не забивать диск
+            # Очищаем старые неиспользуемые образы
             docker image prune -f
