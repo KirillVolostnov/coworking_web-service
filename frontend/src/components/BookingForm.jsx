@@ -15,8 +15,8 @@ function toApiDateTime(value) {
 }
 
 const DURATION_OPTIONS = Array.from({ length: 18 }, (_, index) => (index + 1) * 20);
-const TIME_OPTIONS = Array.from({ length: 48 }, (_, index) => {
-  const totalMinutes = index * 30;
+const TIME_OPTIONS = Array.from({ length: 29 }, (_, index) => {
+  const totalMinutes = (7 * 60) + index * 30;
   const hours = String(Math.floor(totalMinutes / 60)).padStart(2, "0");
   const minutes = String(totalMinutes % 60).padStart(2, "0");
   return `${hours}:${minutes}`;
@@ -31,7 +31,7 @@ function formatDurationLabel(minutes) {
   }
   if (restMinutes === 0) {
     return `${hours} ч`;
-  }
+  }index
   return `${hours} ч ${restMinutes} мин`;
 }
 
@@ -141,6 +141,7 @@ export default function BookingForm({ roomId, token, onBooked }) {
           selected={selectedDate}
           onChange={(value) => setSelectedDate(value)}
           dateFormat="dd.MM.yyyy"
+          minDate={new Date()}
           placeholderText="дд.мм.гггг"
           locale="ru"
           className="date-picker-input"
