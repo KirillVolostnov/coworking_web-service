@@ -49,8 +49,8 @@
 
 1. Склонируйте репозиторий:
    ```bash
-   git clone <URL_вашего_репозитория>
-   cd KURS_BEK_6
+   git clone https://github.com/KirillVolostnov/coworking_web-service.git
+   cd coworking_web-service
    ```
 
 2. Настройте переменные окружения:
