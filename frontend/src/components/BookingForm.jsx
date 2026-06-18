@@ -31,7 +31,7 @@ function formatDurationLabel(minutes) {
   }
   if (restMinutes === 0) {
     return `${hours} ч`;
-  }index
+  }
   return `${hours} ч ${restMinutes} мин`;
 }
 
